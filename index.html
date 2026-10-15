@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SPARK – Game Launcher</title>
+<meta name="description" content="SPARK ist der kostenlose Spiele-Launcher von MrZock: Spiele mit einem Klick installieren, automatisch aktualisieren und starten.">
+<meta name="theme-color" content="#05060b">
+<meta property="og:title" content="SPARK – Game Launcher">
+<meta property="og:description" content="Installieren. Aktualisieren. Spielen. Mit einem Klick.">
+<meta property="og:image" content="https://mrzock.github.io/spark/assets/blackout.jpg">
+<link rel="icon" type="image/png" href="assets/spark-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+  /* ===== SPARK Design: dieselben Farben und Formen wie im Launcher ===== */
+  :root {
+    --bg: #05060b; --bg2: #0a0c14; --glass: rgba(14, 17, 28, .66); --line: rgba(120, 200, 255, .13); --line-hot: rgba(255, 150, 60, .45);
+    --text: #eef2fb; --dim: #9aa3ba; --faint: #586078;
+    --amber: #ffc93c; --orange: #ff6a1f; --cyan: #2ee6ff; --violet: #8a5cff; --ok: #4ff0a0;
+    --f-head: "Orbitron", "Segoe UI", system-ui, sans-serif; --f-body: "Rajdhani", "Segoe UI", system-ui, sans-serif; --f-mono: "JetBrains Mono", Consolas, monospace;
+    --cut: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
+    --cut-s: polygon(9px 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%, 0 9px);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 500 18px/1.55 var(--f-body); overflow-x: hidden; }
+  a { color: inherit; text-decoration: none; }
+  ::selection { background: rgba(46, 230, 255, .3); }
+
+  /* ----- Hintergrund: Nebel, Horizont-Raster, Scanlines, Funken ----- */
+  .space { position: fixed; inset: 0; z-index: -3; background:
+      radial-gradient(1100px 620px at 78% -8%, rgba(255, 106, 31, .20), transparent 62%),
+      radial-gradient(900px 600px at -5% 25%, rgba(138, 92, 255, .16), transparent 60%),
+      radial-gradient(700px 400px at 50% 110%, rgba(46, 230, 255, .14), transparent 70%), var(--bg); }
+  .horizon { position: fixed; left: -60%; right: -60%; bottom: -12%; height: 62vh; z-index: -2; transform: perspective(480px) rotateX(64deg); transform-origin: bottom;
+    background-image: linear-gradient(rgba(46, 230, 255, .28) 1px, transparent 1px), linear-gradient(90deg, rgba(46, 230, 255, .28) 1px, transparent 1px); background-size: 64px 64px;
+    mask-image: linear-gradient(to top, #000 0%, transparent 80%); -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 80%); animation: run 5s linear infinite; opacity: .55; }
+  @keyframes run { to { background-position: 0 64px; } }
+  .scan { position: fixed; inset: 0; z-index: 50; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(255, 255, 255, .018) 0 1px, transparent 1px 3px); mix-blend-mode: overlay; }
+  #fx { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+  .wrap { width: min(1200px, 100% - 36px); margin: 0 auto; }
+
+  /* ----- HUD-Rahmen: Eckwinkel an Karten ----- */
+  .hud { position: relative; }
+  .hud::before, .hud::after { content: ""; position: absolute; width: 16px; height: 16px; pointer-events: none; border: 2px solid var(--cyan); opacity: .7; transition: .25s; }
+  .hud::before { left: -1px; top: -1px; border-right: 0; border-bottom: 0; }
+  .hud::after { right: -1px; bottom: -1px; border-left: 0; border-top: 0; }
+  .hud:hover::before, .hud:hover::after { width: 34px; height: 34px; border-color: var(--amber); opacity: 1; }
+  .label { font: 500 12px var(--f-mono); letter-spacing: 2px; color: var(--cyan); text-transform: uppercase; }
+
+  /* ----- Navigation ----- */
+  nav { position: sticky; top: 0; z-index: 20; backdrop-filter: blur(16px) saturate(1.3); background: rgba(5, 6, 11, .62); border-bottom: 1px solid var(--line); }
+  nav .wrap { display: flex; align-items: center; height: 68px; gap: 30px; }
+  .brand { display: flex; align-items: center; gap: 12px; font: 900 21px var(--f-head); letter-spacing: 6px; }
+  .bolt { width: 30px; height: 30px; filter: drop-shadow(0 0 10px rgba(255, 150, 40, .9)); animation: flick 4s infinite; }
+  @keyframes flick { 0%, 92%, 100% { opacity: 1; } 93% { opacity: .35; } 95% { opacity: 1; } 97% { opacity: .6; } }
+  nav .links { display: flex; gap: 30px; margin-left: auto; font: 600 16px var(--f-body); letter-spacing: 2px; text-transform: uppercase; color: var(--dim); }
+  nav .links a { position: relative; padding: 6px 0; }
+  nav .links a::after { content: ""; position: absolute; left: 0; right: 100%; bottom: 0; height: 2px; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); transition: right .25s; }
+  nav .links a:hover { color: var(--text); } nav .links a:hover::after { right: 0; }
+
+  /* ----- Knöpfe ----- */
+  .btn { position: relative; display: inline-flex; align-items: center; gap: 12px; padding: 17px 32px; font: 700 15px var(--f-head); letter-spacing: 3px; text-transform: uppercase; color: #160900; cursor: pointer;
+    background: linear-gradient(120deg, var(--amber), var(--orange) 70%); clip-path: var(--cut); transition: filter .2s, transform .2s; overflow: hidden; }
+  .btn::after { content: ""; position: absolute; top: 0; bottom: 0; width: 40%; left: -60%; background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .55), transparent); transform: skewX(-20deg); transition: left .5s; }
+  .btn:hover { filter: brightness(1.1) drop-shadow(0 0 22px rgba(255, 120, 40, .7)); transform: translateY(-2px); }
+  .btn:hover::after { left: 120%; }
+  .btn small { font: 600 13px var(--f-body); letter-spacing: 1px; text-transform: none; opacity: .75; }
+  .btn.alt { color: var(--text); background: linear-gradient(120deg, rgba(46, 230, 255, .2), rgba(138, 92, 255, .14)); box-shadow: inset 0 0 0 1px rgba(46, 230, 255, .5); }
+  .btn.alt:hover { filter: drop-shadow(0 0 18px rgba(46, 230, 255, .55)); }
+  .btn.sm { padding: 10px 20px; font-size: 13px; }
+
+  /* ----- Hero ----- */
+  .hero { padding: 84px 0 40px; display: grid; grid-template-columns: 1fr 1.05fr; gap: 56px; align-items: center; min-height: calc(100vh - 68px); }
+  .status { display: inline-flex; align-items: center; gap: 10px; padding: 7px 14px; border: 1px solid rgba(46, 230, 255, .35); background: rgba(46, 230, 255, .06); clip-path: var(--cut-s); }
+  .status i { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 12px var(--ok); animation: pulse 1.6s infinite; }
+  @keyframes pulse { 50% { opacity: .35; } }
+  h1 { position: relative; margin: 26px 0 14px; font: 900 clamp(64px, 10vw, 132px)/.9 var(--f-head); letter-spacing: 12px;
+    background: linear-gradient(180deg, #fff 0%, #ffe3b0 45%, var(--orange) 100%); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 34px rgba(255, 110, 30, .38)); }
+  h1::after { content: attr(data-t); position: absolute; left: 3px; top: 0; color: var(--cyan); -webkit-text-fill-color: var(--cyan); opacity: 0; mix-blend-mode: screen; clip-path: inset(40% 0 45% 0); animation: glitch 6s infinite; }
+  @keyframes glitch { 0%, 94%, 100% { opacity: 0; transform: none; } 95% { opacity: .8; transform: translateX(-6px); clip-path: inset(10% 0 70% 0); } 97% { opacity: .7; transform: translateX(5px); clip-path: inset(60% 0 12% 0); } }
+  .lead { font-size: 24px; line-height: 1.45; color: #cdd3e3; max-width: 540px; margin: 0 0 34px; }
+  .lead b { color: var(--amber); font-weight: 700; }
+  .cta { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+  .facts { display: flex; gap: 26px; margin-top: 34px; flex-wrap: wrap; }
+  .facts div { border-left: 2px solid var(--orange); padding-left: 12px; }
+  .facts b { display: block; font: 700 22px var(--f-head); letter-spacing: 1px; }
+  .facts span { font: 500 11px var(--f-mono); letter-spacing: 2px; color: var(--faint); text-transform: uppercase; }
+
+  /* ----- Launcher-Vorschau (in HTML nachgebaut – sieht aus wie der echte Launcher) ----- */
+  .stage { position: relative; }
+  .ring { position: absolute; inset: -8% -6%; border-radius: 50%; border: 1px dashed rgba(46, 230, 255, .2); animation: spin 60s linear infinite; }
+  .ring.b { inset: 4% 6%; border-style: solid; border-color: rgba(255, 150, 60, .12); animation-duration: 90s; animation-direction: reverse; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .win { position: relative; background: var(--bg2); clip-path: var(--cut); box-shadow: 0 40px 100px rgba(0, 0, 0, .7), 0 0 0 1px var(--line); transform: perspective(1400px) rotateY(-10deg) rotateX(4deg); transition: transform .6s; }
+  .stage:hover .win { transform: perspective(1400px) rotateY(-2deg) rotateX(1deg); }
+  .float { position: absolute; z-index: 2; padding: 10px 14px; background: rgba(10, 12, 20, .85); backdrop-filter: blur(8px); clip-path: var(--cut-s); box-shadow: inset 0 0 0 1px rgba(46, 230, 255, .35); font: 600 14px var(--f-body); animation: bob 5s ease-in-out infinite; }
+  .float b { display: block; font: 500 10px var(--f-mono); color: var(--cyan); letter-spacing: 2px; }
+  .float.f1 { right: 8%; top: -26px; } .float.f2 { right: -20px; bottom: 14%; animation-delay: -2.5s; }
+  @keyframes bob { 50% { transform: translateY(-10px); } }
+  /* Fensterinhalt = gleiche Klassen-Optik wie im Launcher */
+  .w-bar { height: 34px; display: flex; align-items: center; gap: 9px; padding: 0 14px; border-bottom: 1px solid var(--line); font: 900 12px var(--f-head); letter-spacing: 4px; background: rgba(255, 255, 255, .015); }
+  .w-bar svg { width: 15px; height: 15px; }
+  .w-bar em { margin-left: auto; display: flex; align-items: center; gap: 6px; font: 500 10px var(--f-mono); font-style: normal; color: var(--ok); letter-spacing: 1px; }
+  .w-bar em::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 8px var(--ok); }
+  .w-body { display: grid; grid-template-columns: 150px 1fr; height: 330px; }
+  .w-side { border-right: 1px solid var(--line); padding: 12px 10px; background: rgba(0, 0, 0, .25); }
+  .w-side .label { font-size: 9px; margin: 0 4px 10px; display: block; }
+  .w-game { display: flex; gap: 8px; align-items: center; padding: 7px; clip-path: var(--cut-s); background: linear-gradient(90deg, rgba(255, 106, 31, .28), rgba(255, 106, 31, .04)); box-shadow: inset 2px 0 0 var(--orange); }
+  .w-game img { width: 30px; height: 30px; }
+  .w-game b { display: block; font: 700 10px var(--f-head); letter-spacing: 1px; }
+  .w-game span { font: 500 10px var(--f-body); color: var(--amber); }
+  .w-ghost { height: 44px; margin-top: 8px; border: 1px dashed var(--line); clip-path: var(--cut-s); }
+  .w-main { position: relative; overflow: hidden; }
+  .w-main .cv { position: absolute; inset: 0; background: url(assets/blackout.jpg) center / cover; }
+  .w-main .sh { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(10, 12, 20, .96) 5%, rgba(10, 12, 20, .25) 70%), linear-gradient(0deg, var(--bg2) 2%, transparent 55%); }
+  .w-main .in { position: absolute; left: 20px; bottom: 22px; right: 20px; }
+  .w-main h4 { margin: 0; font: 900 30px var(--f-head); letter-spacing: 5px; color: var(--orange); text-shadow: 0 0 20px rgba(255, 106, 31, .5); }
+  .w-main p { margin: 2px 0 12px; font-size: 13px; color: #cdd3e3; }
+  .w-play { display: inline-block; padding: 9px 22px; font: 700 11px var(--f-head); letter-spacing: 3px; color: #04140a; background: linear-gradient(120deg, #a4ffc8, #2fd07a); clip-path: var(--cut-s); }
+  .w-chips { display: flex; gap: 6px; margin-top: 12px; }
+  .w-chips span { font: 500 9px var(--f-mono); padding: 4px 7px; color: var(--dim); box-shadow: inset 0 0 0 1px var(--line); }
+
+  /* ----- Laufband ----- */
+  .ticker { border-block: 1px solid var(--line); background: rgba(255, 255, 255, .02); overflow: hidden; white-space: nowrap; }
+  .ticker div { display: inline-block; padding: 14px 0; animation: tick 30s linear infinite; font: 700 15px var(--f-head); letter-spacing: 6px; color: var(--faint); }
+  .ticker em { font-style: normal; color: var(--orange); margin: 0 26px; }
+  @keyframes tick { to { transform: translateX(-50%); } }
+
+  /* ----- Abschnitte ----- */
+  section { padding: 96px 0; }
+  .head { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 42px; flex-wrap: wrap; }
+  h2 { margin: 8px 0 0; font: 900 clamp(32px, 4.6vw, 52px)/1 var(--f-head); letter-spacing: 5px; }
+  h2 span { color: var(--orange); text-shadow: 0 0 26px rgba(255, 106, 31, .45); }
+  .head p { margin: 0; color: var(--dim); max-width: 440px; font-size: 19px; }
+  .feats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .card { padding: 30px 28px; background: var(--glass); backdrop-filter: blur(10px); clip-path: var(--cut); box-shadow: inset 0 0 0 1px var(--line); transition: transform .25s, box-shadow .25s; }
+  .card:hover { transform: translateY(-6px); box-shadow: inset 0 0 0 1px var(--line-hot), 0 20px 50px rgba(0, 0, 0, .4); }
+  .card .no { font: 500 12px var(--f-mono); color: var(--faint); letter-spacing: 2px; }
+  .ico { width: 54px; height: 54px; margin: 14px 0 18px; display: grid; place-items: center; clip-path: var(--cut-s); background: linear-gradient(135deg, rgba(255, 201, 60, .2), rgba(255, 106, 31, .06)); box-shadow: inset 0 0 0 1px var(--line-hot); }
+  .ico svg { width: 26px; height: 26px; stroke: var(--amber); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 6px rgba(255, 180, 60, .6)); }
+  .card h3 { margin: 0 0 8px; font: 700 17px var(--f-head); letter-spacing: 2px; }
+  .card p { margin: 0; color: var(--dim); }
+
+  /* ----- Spiele ----- */
+  .game { display: grid; grid-template-columns: 1.25fr 1fr; clip-path: var(--cut); background: var(--glass); box-shadow: inset 0 0 0 1px var(--line); overflow: hidden; }
+  .game .pic { position: relative; min-height: 400px; background: url(assets/blackout.jpg) center / cover; }
+  .game .pic::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 45%, rgba(10, 12, 20, .98)), linear-gradient(0deg, rgba(10, 12, 20, .6), transparent 40%); }
+  .game .pic img { position: absolute; left: 24px; bottom: 22px; width: 76px; z-index: 1; filter: drop-shadow(0 6px 18px rgba(0, 0, 0, .8)); }
+  .game .txt { padding: 40px 38px 34px; display: flex; flex-direction: column; gap: 14px; }
+  .game h3 { margin: 0; font: 900 42px var(--f-head); letter-spacing: 7px; color: var(--orange); text-shadow: 0 0 28px rgba(255, 106, 31, .5); }
+  .tags { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tag { font: 500 11px var(--f-mono); letter-spacing: 1px; padding: 5px 10px; color: var(--dim); box-shadow: inset 0 0 0 1px var(--line); text-transform: uppercase; }
+  .tag.hot { color: var(--amber); box-shadow: inset 0 0 0 1px var(--line-hot); }
+  .game ul { margin: 0; padding: 0; list-style: none; color: #d2d7e5; }
+  .game li { padding-left: 22px; position: relative; margin-bottom: 5px; }
+  .game li::before { content: ""; position: absolute; left: 2px; top: 10px; width: 8px; height: 8px; background: linear-gradient(135deg, var(--amber), var(--orange)); transform: rotate(45deg); box-shadow: 0 0 8px rgba(255, 140, 40, .7); }
+  .more { margin-top: 20px; padding: 26px; text-align: center; font: 700 14px var(--f-head); letter-spacing: 5px; color: var(--faint); clip-path: var(--cut); box-shadow: inset 0 0 0 1px var(--line); background: repeating-linear-gradient(135deg, rgba(255, 255, 255, .015) 0 12px, transparent 12px 24px); }
+
+  /* ----- Download ----- */
+  .dl { display: grid; grid-template-columns: 1.15fr 1fr; gap: 20px; }
+  .dl .card { display: flex; flex-direction: column; gap: 12px; padding: 36px; }
+  .dl .card.main { background: linear-gradient(135deg, rgba(255, 106, 31, .14), rgba(14, 17, 28, .7) 55%); box-shadow: inset 0 0 0 1px var(--line-hot); }
+  .dl h3 { font-size: 22px !important; }
+  .dl .btn { align-self: flex-start; margin-top: 10px; }
+  .file { font: 500 13px var(--f-mono); color: var(--faint); }
+  .steps { margin-top: 30px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; counter-reset: s; }
+  .step { position: relative; padding: 24px 24px 24px 82px; background: linear-gradient(90deg, rgba(46, 230, 255, .07), transparent); border-left: 2px solid var(--cyan); }
+  .step::before { counter-increment: s; content: "0" counter(s); position: absolute; left: 22px; top: 20px; font: 900 32px var(--f-head); color: var(--cyan); text-shadow: 0 0 16px rgba(46, 230, 255, .7); }
+  .step b { font: 700 16px var(--f-head); letter-spacing: 2px; }
+  .step p { margin: 4px 0 0; color: var(--dim); }
+  .warn { margin-top: 22px; padding: 18px 22px; clip-path: var(--cut-s); background: rgba(255, 201, 60, .07); box-shadow: inset 0 0 0 1px rgba(255, 201, 60, .3); color: #ffe7ad; }
+
+  /* ----- FAQ ----- */
+  .faq { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; }
+  details { padding: 20px 24px; background: var(--glass); clip-path: var(--cut-s); box-shadow: inset 0 0 0 1px var(--line); }
+  details[open] { box-shadow: inset 0 0 0 1px rgba(46, 230, 255, .4); }
+  summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 18px; font: 700 15px var(--f-head); letter-spacing: 1px; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; color: var(--cyan); font-size: 22px; line-height: .9; transition: transform .25s; }
+  details[open] summary::after { transform: rotate(45deg); }
+  details p { margin: 12px 0 0; color: var(--dim); }
+
+  footer { border-top: 1px solid var(--line); padding: 34px 0 46px; color: var(--faint); }
+  footer .wrap { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
+  footer nav { all: unset; display: flex; gap: 22px; }
+  footer a:hover { color: var(--text); }
+
+  .rv { opacity: 0; transform: translateY(30px); transition: opacity .8s, transform .8s; }
+  .rv.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; } .rv { opacity: 1; transform: none; } }
+  @media (max-width: 960px) {
+    .hero { grid-template-columns: 1fr; min-height: 0; padding-top: 50px; } .win { transform: none !important; } .float.f1 { left: 6px; } .float.f2 { right: 6px; }
+    .feats { grid-template-columns: 1fr 1fr; } .game, .dl, .faq { grid-template-columns: 1fr; } .steps { grid-template-columns: 1fr; }
+    .game .pic { min-height: 240px; } .game .pic::after { background: linear-gradient(0deg, rgba(10, 12, 20, .98), transparent 60%); }
+    nav .links { display: none; } nav .btn { margin-left: auto; }
+  }
+  @media (max-width: 560px) { .feats { grid-template-columns: 1fr; } h1 { letter-spacing: 7px; } .w-body { grid-template-columns: 1fr; height: 260px; } .w-side { display: none; } .float { display: none; } .btn { padding: 15px 22px; letter-spacing: 2px; } .facts { gap: 18px; } }
+</style>
+</head>
+<body>
+<div class="space"></div><div class="horizon"></div><canvas id="fx"></canvas><div class="scan"></div>
+<svg width="0" height="0" style="position:absolute"><defs><linearGradient id="bg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe066"/><stop offset="1" stop-color="#ff5a1a"/></linearGradient>
+  <symbol id="bolt" viewBox="0 0 24 24"><path fill="url(#bg1)" d="M13.5 1 4 13.5h6.2L8.8 23 20 9.6h-6.4L16.4 1z"/></symbol></defs></svg>
+
+<nav><div class="wrap">
+  <a class="brand" href="#top"><svg class="bolt"><use href="#bolt"/></svg>SPARK</a>
+  <div class="links"><a href="#features">Features</a><a href="#games">Spiele</a><a href="#download">Download</a><a href="#faq">FAQ</a></div>
+  <a class="btn sm" href="#download">Download</a>
+</div></nav>
+
+<header class="wrap hero" id="top">
+  <div>
+    <span class="status label"><i></i>System online · v<span class="ver">1</span></span>
+    <h1 data-t="SPARK">SPARK</h1>
+    <p class="lead">Der Game-Launcher für die Spiele von <b>MrZock</b>. Installieren, aktualisieren und starten – <b>mit einem Klick.</b></p>
+    <div class="cta">
+      <a class="btn" id="dlHero" href="https://github.com/MrZock/spark/releases"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 21h16"/></svg>Download <small id="dlHeroSize">für Windows</small></a>
+      <a class="btn alt" href="#games">Spiele ansehen</a>
+    </div>
+    <div class="facts">
+      <div><b>0 €</b><span>Kostenlos</span></div>
+      <div><b>1 Klick</b><span>Installieren</span></div>
+      <div><b id="nGames">1</b><span>Spiele</span></div>
+    </div>
+  </div>
+  <div class="stage rv">
+    <div class="ring"></div><div class="ring b"></div>
+    <div class="float f1"><b>SHA-256</b>✓ alle Dateien geprüft</div>
+    <div class="float f2"><b>AUTO-UPDATE</b>⟳ <span class="gver">Alpha</span> bereit</div>
+    <div class="win hud">
+      <div class="w-bar"><svg><use href="#bolt"/></svg>SPARK<em>ONLINE</em></div>
+      <div class="w-body">
+        <div class="w-side"><span class="label">Bibliothek</span>
+          <div class="w-game"><img src="assets/blackout-icon.png" alt=""><div><b>BLACKOUT</b><span>Update verfügbar</span></div></div>
+          <div class="w-ghost"></div></div>
+        <div class="w-main"><div class="cv"></div><div class="sh"></div>
+          <div class="in"><h4>BLACKOUT</h4><p>3D-Survival · Einzelspieler &amp; Online</p><span class="w-play">▶ Spielen</span>
+            <div class="w-chips"><span class="gver">Alpha</span><span>12 Std. gespielt</span><span>zuletzt heute</span></div></div></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="ticker" aria-hidden="true"><div id="tick"></div></div>
+
+<section id="features"><div class="wrap">
+  <div class="head rv"><div><span class="label">// Features</span><h2>GEBAUT FÜR <span>SPEED</span></h2></div><p>Ein Programm für alle Spiele – schnell, sicher und ohne Schnickschnack.</p></div>
+  <div class="feats">
+    <div class="card hud rv"><span class="no">01</span><div class="ico"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></div><h3>EIN KLICK</h3><p>Spiel auswählen, installieren, loslegen. Danach startet es direkt aus der Bibliothek.</p></div>
+    <div class="card hud rv"><span class="no">02</span><div class="ico"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></div><h3>AUTO-UPDATES</h3><p>Neue Versionen erkennt SPARK sofort und lädt nur die Dateien, die sich geändert haben.</p></div>
+    <div class="card hud rv"><span class="no">03</span><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.5 9.5 8 11 4.5-1.5 8-6 8-11V5z"/><path d="m9 12 2 2 4-4"/></svg></div><h3>GEPRÜFT</h3><p>Jede Datei wird per SHA-256 kontrolliert. Kaputte oder veränderte Downloads haben keine Chance.</p></div>
+    <div class="card hud rv"><span class="no">04</span><div class="ico"><svg viewBox="0 0 24 24"><path d="M5 3h11l3 3v15H5z"/><path d="M8 3v6h7V3M8 21v-7h8v7"/></svg></div><h3>SPIELSTÄNDE</h3><p>Saves liegen sicher in „Dokumente“ – sie bleiben sogar beim Deinstallieren erhalten.</p></div>
+    <div class="card hud rv"><span class="no">05</span><div class="ico"><svg viewBox="0 0 24 24"><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/><circle cx="12" cy="12" r="10"/></svg></div><h3>OFFLINE</h3><p>Installierte Spiele laufen auch ohne Internet. Online spielst du, wann du willst.</p></div>
+    <div class="card hud rv"><span class="no">06</span><div class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6"/></svg></div><h3>STATISTIK</h3><p>SPARK merkt sich deine Spielzeit und wann du zuletzt gespielt hast.</p></div>
+  </div>
+</div></section>
+
+<section id="games"><div class="wrap">
+  <div class="head rv"><div><span class="label">// Bibliothek</span><h2>DIE <span>SPIELE</span></h2></div><p>Alle Spiele sind kostenlos. Neue Titel erscheinen automatisch im Launcher.</p></div>
+  <div class="game rv">
+    <div class="pic"><img src="assets/blackout-icon.png" alt="BLACKOUT-Symbol"></div>
+    <div class="txt">
+      <span class="label">Jetzt verfügbar</span>
+      <h3>BLACKOUT</h3>
+      <div class="tags"><span class="tag hot gver">Alpha</span><span class="tag">3D-Survival</span><span class="tag">Online bis 16</span><span class="tag">Kostenlos</span></div>
+      <p id="gdesc" style="margin:0;color:var(--dim)">Die Welt ist dunkel. Dein Reaktor ist das letzte Licht.</p>
+      <ul id="gfeat"></ul>
+      <div class="cta" style="margin-top:8px"><a class="btn sm" href="#download">In SPARK spielen</a><a class="btn sm alt" href="https://mrzock.github.io/nachtwache/">Im Browser</a></div>
+    </div>
+  </div>
+  <div class="more rv">WEITERE SPIELE IN ARBEIT …</div>
+</div></section>
+
+<section id="download"><div class="wrap">
+  <div class="head rv"><div><span class="label">// Download</span><h2>HOL DIR <span>SPARK</span></h2></div><p id="relinfo">Die neueste Version direkt von GitHub – Windows 10 und 11.</p></div>
+  <div class="dl">
+    <div class="card main hud rv"><span class="label">Empfohlen</span><h3>INSTALLER</h3><p>Legt SPARK im Startmenü und auf dem Desktop an und lässt sich ganz normal deinstallieren.</p><span class="file" id="fSetup">SPARK-Setup.exe</span><a class="btn" id="dlSetup" href="https://github.com/MrZock/spark/releases">Setup laden</a></div>
+    <div class="card hud rv"><span class="label">Ohne Installation</span><h3>PORTABLE</h3><p>Einfach starten – perfekt für den USB-Stick oder Rechner ohne Admin-Rechte.</p><span class="file" id="fPort">SPARK-portable.exe</span><a class="btn alt" id="dlPort" href="https://github.com/MrZock/spark/releases">Portable laden</a></div>
+  </div>
+  <div class="steps">
+    <div class="step rv"><b>LADEN</b><p>Setup oder Portable-Version auswählen.</p></div>
+    <div class="step rv"><b>STARTEN</b><p>Datei öffnen und kurz den Anweisungen folgen.</p></div>
+    <div class="step rv"><b>SPIELEN</b><p>BLACKOUT wählen und auf „Installieren“ klicken.</p></div>
+  </div>
+  <div class="warn rv">⚠ Beim ersten Start zeigt Windows eventuell „Der Computer wurde durch Windows geschützt“. SPARK ist ein Hobby-Projekt ohne teures Code-Zertifikat. Klick auf <b>Weitere Informationen → Trotzdem ausführen</b>.</div>
+</div></section>
+
+<section id="faq"><div class="wrap">
+  <div class="head rv"><div><span class="label">// Hilfe</span><h2><span>FAQ</span></h2></div></div>
+  <div class="faq">
+    <details class="rv"><summary>Kostet SPARK etwas?</summary><p>Nein. SPARK und alle Spiele darin sind kostenlos und werbefrei.</p></details>
+    <details class="rv"><summary>Brauche ich ein Konto?</summary><p>Nein. Herunterladen, starten, spielen – SPARK fragt keine Daten ab.</p></details>
+    <details class="rv"><summary>Wo landen meine Spielstände?</summary><p>In „Dokumente“ im Ordner des Spiels, z. B. Dokumente\BLACKOUT. Im Launcher kommst du über „Spielstände“ direkt hin.</p></details>
+    <details class="rv"><summary>Wie bekomme ich Updates?</summary><p>Automatisch. Sobald es eine neue Version gibt, zeigt SPARK „Update verfügbar“ – ein Klick genügt.</p></details>
+    <details class="rv"><summary>Läuft SPARK auf Mac oder Linux?</summary><p>Aktuell nur auf Windows. BLACKOUT kannst du aber überall direkt im Browser spielen.</p></details>
+    <details class="rv"><summary>Ist das sicher?</summary><p>Ja. SPARK lädt nur von GitHub und prüft jede Datei mit einer Prüfsumme, bevor sie benutzt wird.</p></details>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <a class="brand" href="#top" style="font-size:16px"><svg class="bolt" style="width:22px;height:22px"><use href="#bolt"/></svg>SPARK</a>
+  <span>© <span id="yr">2026</span> MrZock</span>
+  <nav><a href="https://github.com/MrZock/spark">GitHub</a><a href="https://github.com/MrZock/spark/releases">Alle Versionen</a><a href="https://mrzock.github.io/nachtwache/">BLACKOUT</a></nav>
+</div></footer>
+
+<script>
+'use strict';
+const $ = id => document.getElementById(id), mb = b => (b / 1048576).toFixed(0) + ' MB';
+// Neueste SPARK-Version: zuerst in diesem Repo, sonst im BLACKOUT-Repo (Tags „spark-v…“)
+async function latest() {
+  for (const repo of ['MrZock/spark', 'MrZock/nachtwache']) {
+    try {
+      const list = await fetch('https://api.github.com/repos/' + repo + '/releases?per_page=30').then(r => r.json());
+      const rel = (Array.isArray(list) ? list : []).find(r => /^(spark-)?v\d/.test(r.tag_name) && !r.draft && r.assets.some(a => /\.exe$/i.test(a.name)));
+      if (rel) return rel;
+    } catch (e) {}
+  }
+  return null;
+}
+latest().then(rel => {
+  if (!rel) return;
+  const v = rel.tag_name.replace(/^spark-/, '').replace(/^v/, ''), set = rel.assets.find(a => /setup.*\.exe$/i.test(a.name)), port = rel.assets.find(a => /portable.*\.exe$/i.test(a.name));
+  document.querySelectorAll('.ver').forEach(e => e.textContent = v);
+  $('relinfo').textContent = 'SPARK ' + v + ' · veröffentlicht am ' + new Date(rel.published_at).toLocaleDateString('de-DE') + ' · Windows 10 und 11';
+  if (set) { $('dlHero').href = $('dlSetup').href = set.browser_download_url; $('dlHeroSize').textContent = 'Windows · ' + mb(set.size); $('fSetup').textContent = set.name + ' · ' + mb(set.size); }
+  if (port) { $('dlPort').href = port.browser_download_url; $('fPort').textContent = port.name + ' · ' + mb(port.size); }
+});
+// Spiele aus dem SPARK-Katalog (derselbe, den der Launcher benutzt)
+fetch('https://mrzock.github.io/nachtwache/spark/catalog/games.json', { cache: 'no-store' }).then(r => r.json()).then(c => {
+  const games = c.games || [], g = games.find(x => x.id === 'blackout');
+  $('nGames').textContent = games.length;
+  if (!g) return;
+  document.querySelectorAll('.gver').forEach(e => e.textContent = g.version);
+  $('gdesc').textContent = g.description;
+  $('gfeat').innerHTML = (g.features || []).map(f => '<li>' + String(f).replace(/[<>&]/g, '') + '</li>').join('');
+}).catch(() => {});
+$('yr').textContent = new Date().getFullYear();
+// Laufband
+const words = ['INSTALLIEREN', 'AKTUALISIEREN', 'SPIELEN', 'KOSTENLOS', 'OFFLINE', 'SHA-256', 'AUTO-UPDATE', 'BLACKOUT'];
+$('tick').innerHTML = (words.map(w => w + '<em>✦</em>').join('')).repeat(4);
+// Einblenden beim Scrollen
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .12 });
+document.querySelectorAll('.rv').forEach(el => io.observe(el));
+// Funken und Glut, die nach oben steigen; folgen leicht der Maus
+(() => {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const c = $('fx'), g = c.getContext('2d'), P = [], d = Math.min(2, devicePixelRatio || 1); let mx = .5;
+  const rs = () => { c.width = innerWidth * d; c.height = innerHeight * d; }; rs(); addEventListener('resize', rs);
+  addEventListener('pointermove', e => { mx = e.clientX / innerWidth; });
+  for (let i = 0; i < 90; i++) P.push({ x: Math.random(), y: Math.random(), v: .0005 + Math.random() * .0015, s: .5 + Math.random() * 1.7, cyan: Math.random() < .3, w: Math.random() * 6.3 });
+  (function f() {
+    g.clearRect(0, 0, c.width, c.height);
+    for (const p of P) {
+      p.y -= p.v; p.w += .025; p.x += (mx - .5) * .00012; if (p.y < -.02) { p.y = 1.02; p.x = Math.random(); }
+      const x = (p.x + Math.sin(p.w) * .008) * c.width, y = p.y * c.height, a = .3 + .45 * Math.abs(Math.sin(p.w));
+      g.fillStyle = p.cyan ? 'rgba(46,230,255,' + a + ')' : 'rgba(255,' + (120 + (p.s * 40 | 0)) + ',40,' + a + ')';
+      g.shadowColor = g.fillStyle; g.shadowBlur = 10 * d; g.fillRect(x, y, p.s * d, p.s * 2.6 * d);
+    }
+    requestAnimationFrame(f);
+  })();
+})();
+</script>
+</body>
+</html>
