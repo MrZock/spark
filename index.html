@@ -10,16 +10,13 @@
 <meta property="og:description" content="Installieren. Aktualisieren. Spielen. Mit einem Klick.">
 <meta property="og:image" content="https://mrzock.github.io/spark/assets/blackout.jpg">
 <link rel="icon" type="image/png" href="assets/spark-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@500&display=swap">
 <style>
   /* ===== SPARK Design: dieselben Farben und Formen wie im Launcher ===== */
   :root {
     --bg: #05060b; --bg2: #0a0c14; --glass: rgba(14, 17, 28, .66); --line: rgba(120, 200, 255, .13); --line-hot: rgba(255, 150, 60, .45);
     --text: #eef2fb; --dim: #9aa3ba; --faint: #586078;
     --amber: #ffc93c; --orange: #ff6a1f; --cyan: #2ee6ff; --violet: #8a5cff; --ok: #4ff0a0;
-    --f-head: "Orbitron", "Segoe UI", system-ui, sans-serif; --f-body: "Rajdhani", "Segoe UI", system-ui, sans-serif; --f-mono: "JetBrains Mono", Consolas, monospace;
+    --f-head: Bahnschrift, "DIN Alternate", "Arial Narrow", "Segoe UI", system-ui, sans-serif; --f-body: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif; --f-mono: "Cascadia Mono", Consolas, "SF Mono", Menlo, monospace;
     --cut: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
     --cut-s: polygon(9px 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%, 0 9px);
   }
@@ -298,6 +295,7 @@
     <details class="rv"><summary>Wo landen meine Spielstände?</summary><p>In „Dokumente“ im Ordner des Spiels, z. B. Dokumente\BLACKOUT. Im Launcher kommst du über „Spielstände“ direkt hin.</p></details>
     <details class="rv"><summary>Wie bekomme ich Updates?</summary><p>Automatisch. Sobald es eine neue Version gibt, zeigt SPARK „Update verfügbar“ – ein Klick genügt.</p></details>
     <details class="rv"><summary>Läuft SPARK auf Mac oder Linux?</summary><p>Aktuell nur auf Windows. BLACKOUT kannst du aber überall direkt im Browser spielen.</p></details>
+    <details class="rv"><summary>Welche Daten sammelt SPARK?</summary><p>Keine Nutzungsdaten, keine Cookies, kein Tracking. Details stehen in der <a href="datenschutz.html" style="color:var(--cyan)">Datenschutzerklärung</a>.</p></details>
     <details class="rv"><summary>Ist das sicher?</summary><p>Ja. SPARK lädt nur von GitHub und prüft jede Datei mit einer Prüfsumme, bevor sie benutzt wird.</p></details>
   </div>
 </div></section>
@@ -305,7 +303,7 @@
 <footer><div class="wrap">
   <a class="brand" href="#top" style="font-size:16px"><svg class="bolt" style="width:22px;height:22px"><use href="#bolt"/></svg>SPARK</a>
   <span>© <span id="yr">2026</span> MrZock</span>
-  <nav><a href="https://github.com/MrZock/spark">GitHub</a><a href="https://github.com/MrZock/spark/releases">Alle Versionen</a><a href="https://mrzock.github.io/nachtwache/">BLACKOUT</a></nav>
+  <nav><a href="datenschutz.html">Datenschutz</a><a href="https://github.com/MrZock/spark">GitHub</a><a href="https://github.com/MrZock/spark/releases">Alle Versionen</a><a href="https://mrzock.github.io/nachtwache/">BLACKOUT</a></nav>
 </div></footer>
 
 <script>
