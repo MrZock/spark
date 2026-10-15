@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Datenschutz – SPARK</title>
-<meta name="description" content="Datenschutzerklärung für die SPARK-Webseite, den SPARK-Launcher und das Spiel BLACKOUT.">
+<meta name="description" content="Datenschutzerklärung für die SPARK-Webseite, den SPARK-Launcher, SPARK Chat und das Spiel BLACKOUT.">
 <meta name="theme-color" content="#05060b">
 <meta name="robots" content="noindex">
 <link rel="icon" type="image/png" href="assets/spark-icon.png">
@@ -55,7 +55,7 @@
   <header>
     <span class="label">// Rechtliches</span>
     <h1>DATEN<span>SCHUTZ</span></h1>
-    <div class="meta">Stand: Oktober 2026 · gilt für die SPARK-Webseite, den SPARK-Launcher und das Spiel BLACKOUT</div>
+    <div class="meta">Stand: 15. Oktober 2026 · gilt für die SPARK-Webseite, den SPARK-Launcher, SPARK Chat und das Spiel BLACKOUT</div>
   </header>
 
   <div class="tldr">
@@ -64,7 +64,8 @@
       <li>Keine Cookies</li>
       <li>Kein Tracking, keine Analyse-Tools</li>
       <li>Keine Werbung</li>
-      <li>Kein Konto, keine Anmeldung</li>
+      <li>Konto nur für SPARK Chat – dein Passwort verlässt nie deinen PC</li>
+      <li>Chat und Anrufe Ende-zu-Ende-verschlüsselt</li>
       <li>Keine Google-Dienste, keine Schriften von fremden Servern</li>
       <li>Spielstände bleiben auf deinem Gerät</li>
     </ul>
@@ -73,7 +74,8 @@
   <section>
     <h2>1. Wer ist verantwortlich?</h2>
     <p>SPARK und BLACKOUT sind ein privates, nicht-kommerzielles Hobbyprojekt des GitHub-Nutzers <b>MrZock</b>. Es gibt keine Einnahmen, keine Werbung und keine Bezahlfunktionen.</p>
-    <p>Kontakt: am einfachsten über ein <a href="https://github.com/MrZock/spark/issues">Issue im GitHub-Repository</a>.</p>
+    <p id="kontakt"><b>Kontakt:</b> E-Mail an <a href="mailto:{{KONTAKT_EMAIL}}">{{KONTAKT_EMAIL}}</a> oder ein <a href="https://github.com/MrZock/spark/issues">Issue im GitHub-Repository</a> (öffentlich sichtbar – bitte dort keine persönlichen Daten).</p>
+    <p><b>Kontaktstelle nach Art. 11 und 12 Digital Services Act</b> (für Behörden, Nutzer und Meldungen rechtswidriger Inhalte): <a href="mailto:{{KONTAKT_EMAIL}}">{{KONTAKT_EMAIL}}</a>. Sprachen: Deutsch, Englisch.</p>
   </section>
 
   <section>
@@ -108,18 +110,49 @@
     <p class="note">Bitte gib als Spielername nicht deinen echten vollen Namen an. Beleidigende Namen und Chatnachrichten werden automatisch gefiltert.</p>
   </section>
 
+
+  <section id="chat">
+    <h2>5. SPARK Chat</h2>
+    <p>SPARK Chat ist ein Messenger im SPARK-Launcher und im Browser (<a href="https://mrzock.github.io/nachtwache/chat/">mrzock.github.io/nachtwache/chat</a>, auch auf dem Handy). Damit er funktioniert, brauchst du ein Konto. Wir haben ihn so gebaut, dass so wenig Daten wie möglich bei uns ankommen.</p>
+    <h3>Dein Konto</h3>
+    <p>Dein <b>Passwort wird nie übertragen</b>. Aus Passwort und Benutzername berechnet die App auf deinem PC zwei Schlüssel: einen zum Anmelden und einen, der nur auf deinem PC bleibt. Auf dem Server gespeichert werden:</p>
+    <ul>
+      <li>dein Benutzername und das Datum der Registrierung und der letzten Anmeldung (nur der Tag),</li>
+      <li>ein Hash deines Anmeldeschlüssels (scrypt) und zufällige Salzwerte – daraus lässt sich dein Passwort nicht zurückrechnen,</li>
+      <li>dein öffentlicher Schlüssel und dein privater Schlüssel – <b>verschlüsselt</b> mit deinem Passwort, für uns nicht lesbar,</li>
+      <li>deine Freundesliste, offene Freundschaftsanfragen, wen du blockiert hast, und ob du „unsichtbar“ bist,</li>
+      <li>dein <b>Profilbild</b>, falls du eins festlegst (verkleinert auf 192 × 192 Pixel; Kamera- und Standortdaten werden dabei entfernt). Es ist nur für deine Freunde abrufbar, aber nicht Ende-zu-Ende-verschlüsselt. Du kannst es jederzeit ändern oder entfernen.</li>
+      <li>zum Schutz vor dem Erraten von Passwörtern: die Zahl falscher Anmeldeversuche und ggf. eine Sperrzeit von 15 Minuten.</li>
+    </ul>
+    <p>Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung des Chats, den du nutzen möchtest). Du musst <b>mindestens 16 Jahre</b> alt sein.</p>
+    <h3>Nachrichten und Sprachanrufe</h3>
+    <p>Nachrichten, <b>Bilder</b>, Einladungen und Sprachanrufe sind <b>Ende-zu-Ende-verschlüsselt</b> (ECDH P-256 und AES-256-GCM). Nur du und dein Freund können sie lesen bzw. hören – der Server leitet sie nur verschlüsselt weiter. Anrufe werden nicht aufgezeichnet. Ist dein Freund offline, hält der Server die verschlüsselte Nachricht <b>nur im Arbeitsspeicher</b> bereit, bis sie zugestellt ist – höchstens 7 Tage, bei einem Neustart des Servers ist sie weg (deine App schickt sie dann erneut). Pro Person werden höchstens 10 MB zwischengehalten. Für die Weiterleitung muss der Server wissen, von wem an wen eine Nachricht geht und wann; das wird nicht gespeichert.</p>
+    <p>Freunde sehen, ob du online bist und ob du gerade BLACKOUT spielst. Mit <b>„Unsichtbar“</b> in den Chat-Einstellungen schaltest du das ab. Nicht-Freunde sehen davon nichts; Benutzer können nicht gesucht oder aufgelistet werden.</p>
+    <p>Bilder werden vor dem Senden auf deinem Gerät verkleinert (höchstens 1600 Pixel, ca. 400 KB); Kamera- und Standortdaten (EXIF) fallen dabei weg.</p>
+    <h3>Auf deinem Gerät</h3>
+    <p>Deine Chatverläufe und Bilder liegen <b>nur auf deinem Gerät</b>, verschlüsselt mit deinem Schlüssel – im SPARK-Launcher in dessen Datenordner, im Browser im Speicher des Browsers für <code>mrzock.github.io</code> (localStorage und IndexedDB). Außerdem werden dort deine Einstellungen und die Profilbilder deiner Freunde zwischengespeichert. Das ist für die Funktion nötig (§ 25 Abs. 2 Nr. 2 TDDDG); Cookies werden nicht verwendet. Wenn du „Angemeldet bleiben“ wählst, werden deine Anmeldeschlüssel gespeichert: im SPARK-Launcher geschützt durch die Windows-Verschlüsselung deines Benutzerkontos, im Browser im Speicher dieses Browsers – nutze das im Browser nur auf deinem eigenen Gerät. Ohne Häkchen ist man im Browser nach dem Schließen des Tabs abgemeldet. Du kannst Verläufe in den Chat-Einstellungen löschen; „Abmelden“ entfernt die gespeicherte Anmeldung.</p>
+    <h3>Wo die Daten liegen</h3>
+    <p>Der Chat-Server läuft bei <b>Render</b> (siehe Abschnitt 4). Die Kontodaten von oben werden in einem <b>privaten GitHub-Repository</b> gespeichert, auf das nur der Betreiber Zugriff hat (GitHub Inc., USA, siehe Abschnitt 2). Es wird dort ohne Versionsverlauf gespeichert, damit gelöschte Daten wirklich gelöscht sind. Beide Anbieter berufen sich für Übermittlungen in die USA auf das EU-US Data Privacy Framework bzw. Standardvertragsklauseln.</p>
+    <h3>IP-Adresse</h3>
+    <p>Für die Verbindung ist deine IP-Adresse technisch nötig. Der Chat-Server nutzt sie nur im Arbeitsspeicher, um Missbrauch zu begrenzen (z. B. höchstens 20 Anmeldeversuche in 5 Minuten, 5 neue Konten pro Stunde). Sie wird nicht auf der Festplatte gespeichert und nicht mit deinem Konto verknüpft. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (Schutz vor Missbrauch).</p>
+    <h3>Meldungen</h3>
+    <p>Wenn du jemanden meldest, werden dein Benutzername, der gemeldete Benutzername, der Grund, dein Text und – nur wenn du das Häkchen setzt – die letzten 20 Nachrichten des Chats <b>im Klartext</b> übermittelt, damit wir die Meldung prüfen können. Meldungen werden im privaten Repository gespeichert und nach <b>6 Monaten automatisch gelöscht</b>. Rechtsgrundlage ist Art. 6 Abs. 1 lit. c DSGVO (Pflichten aus dem Digital Services Act) und lit. f (Schutz der Nutzer). Bei einem Verdacht auf eine Straftat, die Leben oder Sicherheit bedroht, sind wir nach Art. 18 DSA verpflichtet, die Behörden zu informieren.</p>
+    <h3>Speicherdauer und Löschen</h3>
+    <p>Dein Konto bleibt gespeichert, bis du es löschst: <b>Chat → ⚙ Einstellungen → Konto löschen</b>. Es wird dann sofort vom Server entfernt, auch aus den Freundeslisten anderer. Konten, die <b>2 Jahre</b> nicht benutzt wurden, werden automatisch gelöscht. Unter <b>⚙ Einstellungen → Meine Daten anzeigen</b> siehst du jederzeit alles, was der Server über dich gespeichert hat, und kannst es als Datei speichern.</p>
+  </section>
+
   <section>
-    <h2>5. Deine Rechte</h2>
-    <p>Du hast das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung der Verarbeitung (Art. 18), Datenübertragbarkeit (Art. 20) und Widerspruch gegen Verarbeitungen auf Grundlage berechtigter Interessen (Art. 21). Wenn du z. B. einen Ranglisten-Eintrag löschen lassen möchtest, melde dich über GitHub (Abschnitt 1).</p>
+    <h2>6. Deine Rechte</h2>
+    <p>Du hast das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung der Verarbeitung (Art. 18), Datenübertragbarkeit (Art. 20) und Widerspruch gegen Verarbeitungen auf Grundlage berechtigter Interessen (Art. 21). Für SPARK Chat kannst du Auskunft und Löschung direkt in der App erledigen (Abschnitt 5). Für alles andere, z. B. wenn du einen Ranglisten-Eintrag löschen lassen möchtest, schreib an die Kontaktadresse in Abschnitt 1.</p>
     <p>Außerdem kannst du dich bei einer Datenschutz-Aufsichtsbehörde beschweren, zum Beispiel bei der Behörde deines Bundeslandes.</p>
   </section>
 
   <section>
-    <h2>6. Änderungen</h2>
+    <h2>7. Änderungen</h2>
     <p>Wenn SPARK oder BLACKOUT neue Funktionen bekommen, die Daten betreffen, wird diese Seite angepasst. Es gilt immer die hier veröffentlichte Fassung.</p>
   </section>
 </main>
-<footer>© <span id="yr">2026</span> MrZock · <a href="./">SPARK</a> · <a href="https://mrzock.github.io/nachtwache/">BLACKOUT</a></footer>
+<footer>© <span id="yr">2026</span> MrZock · <a href="./">SPARK</a> · <a href="nutzungsbedingungen.html">Nutzungsbedingungen</a> · <a href="https://mrzock.github.io/nachtwache/">BLACKOUT</a></footer>
 <script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
 </body>
 </html>
