@@ -136,6 +136,7 @@
   h2 span { color: var(--orange); text-shadow: 0 0 26px rgba(255, 106, 31, .45); }
   .head p { margin: 0; color: var(--dim); max-width: 440px; font-size: 19px; }
   .feats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .feats .card:nth-child(7) { grid-column: span 3; }
   .card { padding: 30px 28px; background: var(--glass); backdrop-filter: blur(10px); clip-path: var(--cut); box-shadow: inset 0 0 0 1px var(--line); transition: transform .25s, box-shadow .25s; }
   .card:hover { transform: translateY(-6px); box-shadow: inset 0 0 0 1px var(--line-hot), 0 20px 50px rgba(0, 0, 0, .4); }
   .card .no { font: 500 12px var(--f-mono); color: var(--faint); letter-spacing: 2px; }
@@ -213,7 +214,7 @@
 
 <header class="wrap hero" id="top">
   <div>
-    <span class="status label"><i></i>System online · v<span class="ver">1</span></span>
+    <span class="status label"><i></i>System online · Alpha <span class="ver">1</span></span>
     <h1 data-t="SPARK">SPARK</h1>
     <p class="lead">Der Game-Launcher für die Spiele von <b>MrZock</b>. Installieren, aktualisieren und starten – <b>mit einem Klick.</b></p>
     <div class="cta">
@@ -255,6 +256,7 @@
     <div class="card hud rv"><span class="no">04</span><div class="ico"><svg viewBox="0 0 24 24"><path d="M5 3h11l3 3v15H5z"/><path d="M8 3v6h7V3M8 21v-7h8v7"/></svg></div><h3>SPIELSTÄNDE</h3><p>Saves liegen sicher in „Dokumente“ – sie bleiben sogar beim Deinstallieren erhalten.</p></div>
     <div class="card hud rv"><span class="no">05</span><div class="ico"><svg viewBox="0 0 24 24"><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/><circle cx="12" cy="12" r="10"/></svg></div><h3>OFFLINE</h3><p>Installierte Spiele laufen auch ohne Internet. Online spielst du, wann du willst.</p></div>
     <div class="card hud rv"><span class="no">06</span><div class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6"/></svg></div><h3>STATISTIK</h3><p>SPARK merkt sich deine Spielzeit und wann du zuletzt gespielt hast.</p></div>
+    <div class="card hud rv"><span class="no">07</span><div class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></div><h3>EINSTELLUNGEN</h3><p>SPARK aktualisiert sich selbst mit einem Klick. Vollbild, Effekte und mehr stellst du unter ⚙ ein.</p></div>
   </div>
 </div></section>
 
@@ -324,7 +326,7 @@ latest().then(rel => {
   if (!rel) return;
   const v = rel.tag_name.replace(/^spark-/, '').replace(/^v/, ''), set = rel.assets.find(a => /setup.*\.exe$/i.test(a.name)), port = rel.assets.find(a => /portable.*\.exe$/i.test(a.name));
   document.querySelectorAll('.ver').forEach(e => e.textContent = v);
-  $('relinfo').textContent = 'SPARK ' + v + ' · veröffentlicht am ' + new Date(rel.published_at).toLocaleDateString('de-DE') + ' · Windows 10 und 11';
+  $('relinfo').textContent = 'SPARK Alpha ' + v + ' · veröffentlicht am ' + new Date(rel.published_at).toLocaleDateString('de-DE') + ' · Windows 10 und 11';
   if (set) { $('dlHero').href = $('dlSetup').href = set.browser_download_url; $('dlHeroSize').textContent = 'Windows · ' + mb(set.size); $('fSetup').textContent = set.name + ' · ' + mb(set.size); }
   if (port) { $('dlPort').href = port.browser_download_url; $('fPort').textContent = port.name + ' · ' + mb(port.size); }
 });
